@@ -41,7 +41,7 @@ android {
                 quotedBuildConfig(
                     localProperties.getProperty(
                         "kven.baseUrl",
-                        "http://192.168.143.192:14000",
+                        "https://kven-android.kuris.kiev.ua",
                     ),
                 ),
             )
