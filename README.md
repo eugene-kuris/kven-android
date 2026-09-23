@@ -7,11 +7,11 @@ Minimal Android transport for the existing Kven II relationship.
 Keep device credentials outside Git. Add these local-only values to `local.properties`:
 
 ```properties
-kven.baseUrl=http://192.168.143.192:14000
+kven.baseUrl=https://kven-android.kuris.kiev.ua
 kven.apiKey=<native-client-token>
 ```
 
-`local.properties` is ignored by Git. The debug build permits cleartext HTTP only for the current private-lab vertical slice. Release builds do not receive the debug gateway URL or credential.
+`local.properties` is ignored by Git. Release builds do not receive the debug gateway URL or credential. The Android client reaches Kven through the public HTTPS reverse-proxy endpoint; it does not address the private VM192 interface directly.
 
 The client uses the existing OpenAI-style gateway endpoints:
 
