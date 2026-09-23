@@ -1,7 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
 }
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use(::load)
+    }
+}
+
+fun quotedBuildConfig(value: String): String =
+    "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
 android {
     namespace = "ua.kuris.kven2"
@@ -22,7 +34,26 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "KVEN_BASE_URL",
+                quotedBuildConfig(
+                    localProperties.getProperty(
+                        "kven.baseUrl",
+                        "http://192.168.143.192:14000",
+                    ),
+                ),
+            )
+            buildConfigField(
+                "String",
+                "KVEN_NATIVE_CLIENT_API_KEY",
+                quotedBuildConfig(localProperties.getProperty("kven.apiKey", "")),
+            )
+        }
         release {
+            buildConfigField("String", "KVEN_BASE_URL", "\"\"")
+            buildConfigField("String", "KVEN_NATIVE_CLIENT_API_KEY", "\"\"")
             optimization {
                 enable = false
             }
@@ -34,6 +65,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
