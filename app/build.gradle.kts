@@ -45,15 +45,9 @@ android {
                     ),
                 ),
             )
-            buildConfigField(
-                "String",
-                "KVEN_NATIVE_CLIENT_API_KEY",
-                quotedBuildConfig(localProperties.getProperty("kven.apiKey", "")),
-            )
         }
         release {
             buildConfigField("String", "KVEN_BASE_URL", "\"\"")
-            buildConfigField("String", "KVEN_NATIVE_CLIENT_API_KEY", "\"\"")
             optimization {
                 enable = false
             }
