@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -66,6 +67,9 @@ private fun KvenScreen(modifier: Modifier = Modifier) {
     }
     var credentialsSaved by remember {
         mutableStateOf(username.isNotBlank() && password.isNotBlank())
+    }
+    var editingCredentials by remember {
+        mutableStateOf(!credentialsSaved)
     }
     val client = remember(username, password) {
         KvenClient(
@@ -120,48 +124,66 @@ private fun KvenScreen(modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.headlineSmall,
         )
 
-        OutlinedTextField(
-            value = username,
-            onValueChange = {
-                username = it
-                credentialsSaved = false
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isSending,
-            label = { Text("Логин") },
-            singleLine = true,
-        )
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = {
-                password = it
-                credentialsSaved = false
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isSending,
-            label = { Text("Пароль") },
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(if (credentialsSaved) "Логин сохранён" else "")
-            Button(
-                onClick = {
-                    preferences.edit()
-                        .putString("username", username)
-                        .putString("password", password)
-                        .apply()
-                    credentialsSaved = true
-                    error = null
+        if (editingCredentials || !credentialsSaved) {
+            OutlinedTextField(
+                value = username,
+                onValueChange = {
+                    username = it
+                    credentialsSaved = false
                 },
-                enabled = !isSending && username.isNotBlank() && password.isNotBlank(),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isSending,
+                label = { Text("Логин") },
+                singleLine = true,
+            )
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = {
+                    password = it
+                    credentialsSaved = false
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isSending,
+                label = { Text("Пароль") },
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
             ) {
-                Text("Сохранить")
+                Button(
+                    onClick = {
+                        preferences.edit()
+                            .putString("username", username)
+                            .putString("password", password)
+                            .apply()
+                        credentialsSaved = true
+                        editingCredentials = false
+                        error = null
+                    },
+                    enabled = !isSending && username.isNotBlank() && password.isNotBlank(),
+                ) {
+                    Text("Сохранить")
+                }
+            }
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = username,
+                    style = MaterialTheme.typography.labelLarge,
+                )
+                TextButton(
+                    onClick = { editingCredentials = true },
+                    enabled = !isSending,
+                ) {
+                    Text("Изменить")
+                }
             }
         }
 
