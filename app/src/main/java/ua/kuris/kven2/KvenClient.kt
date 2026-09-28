@@ -5,12 +5,15 @@ import org.json.JSONObject
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Base64
 
 class KvenClient(
     private val baseUrl: String,
-    private val apiKey: String,
+    private val username: String,
+    private val password: String,
 ) {
-    fun isConfigured(): Boolean = baseUrl.isNotBlank() && apiKey.isNotBlank()
+    fun isConfigured(): Boolean =
+        baseUrl.isNotBlank() && username.isNotBlank() && password.isNotBlank()
 
     fun sendMessage(message: String): String {
         if (!isConfigured()) {
@@ -78,7 +81,10 @@ class KvenClient(
             connection.connectTimeout = 10_000
             connection.readTimeout = 300_000
             connection.setRequestProperty("Accept", "application/json")
-            connection.setRequestProperty("Authorization", "Bearer $apiKey")
+            val basic = Base64.getEncoder().encodeToString(
+                "$username:$password".toByteArray(Charsets.UTF_8),
+            )
+            connection.setRequestProperty("Authorization", "Basic $basic")
             if (body != null) {
                 connection.doOutput = true
                 connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
