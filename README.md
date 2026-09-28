@@ -2,20 +2,21 @@
 
 Minimal Android transport for the existing Kven II relationship.
 
-## Debug provisioning
+## Connection
 
-Keep device credentials outside Git. Add these local-only values to `local.properties`:
+The debug client uses the public HTTPS gateway:
 
 ```properties
 kven.baseUrl=https://kven-android.kuris.kiev.ua
-kven.apiKey=<native-client-token>
 ```
 
-`local.properties` is ignored by Git. Release builds do not receive the debug gateway URL or credential. The Android client reaches Kven through the public HTTPS reverse-proxy endpoint; it does not address the private VM192 interface directly.
+`local.properties` is ignored by Git. No Android username or password is compiled into the APK.
+
+At first use, the user enters the issued Kven username and password in the app. The app stores them in its private preferences and sends them to the HTTPS gateway with HTTP Basic authentication.
 
 The client uses the existing OpenAI-style gateway endpoints:
 
 - `GET /v1/models`
 - `POST /v1/chat/completions`
 
-The Android app never supplies an email, canonical person ID, or caller-selected Kven provenance. Identity is established server-side from the native client credential and the owner-managed transport-principal registry.
+The Android app never supplies an email, canonical person ID, or caller-selected Kven provenance. The server resolves the authenticated Android username through the same small owner-managed user registry that maps accepted Open WebUI email identities and Telegram numeric identities to one canonical Kven person.
