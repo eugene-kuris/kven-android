@@ -28,6 +28,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import ua.kuris.kven2.ui.theme.KvenIITheme
 
@@ -52,10 +54,24 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun KvenScreen(modifier: Modifier = Modifier) {
-    val client = remember {
+    val context = LocalContext.current
+    val preferences = remember {
+        context.getSharedPreferences("kven-auth", android.content.Context.MODE_PRIVATE)
+    }
+    var username by remember {
+        mutableStateOf(preferences.getString("username", "").orEmpty())
+    }
+    var password by remember {
+        mutableStateOf(preferences.getString("password", "").orEmpty())
+    }
+    var credentialsSaved by remember {
+        mutableStateOf(username.isNotBlank() && password.isNotBlank())
+    }
+    val client = remember(username, password) {
         KvenClient(
             baseUrl = BuildConfig.KVEN_BASE_URL,
-            apiKey = BuildConfig.KVEN_NATIVE_CLIENT_API_KEY,
+            username = username,
+            password = password,
         )
     }
     val mainHandler = remember { Handler(Looper.getMainLooper()) }
@@ -104,11 +120,49 @@ private fun KvenScreen(modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.headlineSmall,
         )
 
-        if (!client.isConfigured()) {
-            Text(
-                text = "Debug-клиент не provisioned: добавьте kven.apiKey в local.properties.",
-                color = MaterialTheme.colorScheme.error,
-            )
+        OutlinedTextField(
+            value = username,
+            onValueChange = {
+                username = it
+                credentialsSaved = false
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isSending,
+            label = { Text("Логин") },
+            singleLine = true,
+        )
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = {
+                password = it
+                credentialsSaved = false
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isSending,
+            label = { Text("Пароль") },
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(if (credentialsSaved) "Логин сохранён" else "")
+            Button(
+                onClick = {
+                    preferences.edit()
+                        .putString("username", username)
+                        .putString("password", password)
+                        .apply()
+                    credentialsSaved = true
+                    error = null
+                },
+                enabled = !isSending && username.isNotBlank() && password.isNotBlank(),
+            ) {
+                Text("Сохранить")
+            }
         }
 
         LazyColumn(
