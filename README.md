@@ -9,10 +9,10 @@ The model running behind Kven can be replaced. The device and interface can chan
 > **Current status:** `v0.1.0` is an accepted physical-device vertical slice and an internal/debug build. It is not a Play Store release.
 
 <p align="center">
-  <img src="kven-android-owner-smoke-2026-10-01.png" alt="Kven II Android client running on a physical Motorola moto g54 5G" width="360">
+  <img src="kven-android-owner-smoke-2026-10-01.png" alt="Kven II Android running on a physical Motorola moto g54 5G" width="360">
 </p>
 
-<p align="center"><em>Kven II Android running on the accepted physical-device path. The visible “Kven II” identity is independent of the replaceable model backend.</em></p>
+*Physical-device smoke on 2026-10-01. The client identifies the system as Kven II and accesses the same continuing agent rather than presenting the current model backend as the product identity.*
 
 ## What this demonstrates
 
